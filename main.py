@@ -12,51 +12,66 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # Head dimensions
 HEAD_WIDTH = 10
 HEAD_HEIGHT = 11  # increased to fit 9px face plus outline
-HEAD_Y = 0         # draw head starting at y=0
+HEAD_Y = 0  # draw head starting at y=0
 
 # Save index (for incremental filenames)
 SAVE_INDEX = 1
 
 # Editor dimensions
 FACE_WIDTH = 8
-FACE_HEIGHT = 9     # allow 9px tall faces
+FACE_HEIGHT = 9  # allow 9px tall faces
+
 
 # Color palettes
 def hex_palette(hex_list):
-    return [tuple(int(h[i:i+2], 16) for i in (0, 2, 4)) for h in hex_list]
+    return [tuple(int(h[i : i + 2], 16) for i in (0, 2, 4)) for h in hex_list]
+
 
 SKIN_TONES = hex_palette(["FFE0BD", "F1C27D", "E0AC69", "C68642", "8D5524"])
 HAIR_COLORS = hex_palette(["000000", "5E3C27", "C27754", "FFE066", "C8C8C8"])
-CLOTHES_COLORS = hex_palette(["E6194B", "3CB44B", "0082C8", "F58230", "911EB4", "D2F53C"])
+CLOTHES_COLORS = hex_palette(
+    ["E6194B", "3CB44B", "0082C8", "F58230", "911EB4", "D2F53C"]
+)
 PANTS_COLORS = hex_palette(["323232", "1E90FF", "228B22", "800080"])
 OUTLINE = (0, 0, 0)
 WHITE = (255, 255, 255)
 SHIRT_STYLES = ["tshirt", "shirt_tie", "lab_coat", "dress"]
 
+
 # Drawing helpers
 def draw_hair(draw, x, y, color):
     style = hair_var.get()
     if style == "flat":
-        draw.rectangle([x, y, x+HEAD_WIDTH-1, y+2], fill=color, outline=OUTLINE)
+        draw.rectangle(
+            [x, y, x + HEAD_WIDTH - 1, y + 2], fill=color, outline=OUTLINE
+        )
     elif style == "side_part":
-        draw.rectangle([x, y, x+HEAD_WIDTH-2, y+2], fill=color, outline=OUTLINE)
+        draw.rectangle(
+            [x, y, x + HEAD_WIDTH - 2, y + 2], fill=color, outline=OUTLINE
+        )
     else:
-        draw.rectangle([x, y, x+HEAD_WIDTH-1, y+3], fill=color, outline=OUTLINE)
+        draw.rectangle(
+            [x, y, x + HEAD_WIDTH - 1, y + 3], fill=color, outline=OUTLINE
+        )
 
 
 def draw_body(draw, x, y, clothes):
     w, h = 12, 10
-    draw.rectangle([x, y, x+w-1, y+h-1], fill=clothes, outline=OUTLINE)
+    draw.rectangle([x, y, x + w - 1, y + h - 1], fill=clothes, outline=OUTLINE)
     style = shirt_var.get()
-    if style == 'shirt_tie':
-        cx = x + w//2
-        draw.line([(cx, y), (cx, y+3)], fill=WHITE)
-        draw.rectangle([cx-1, y+3, cx+1, y+4], fill=WHITE)
-    elif style == 'lab_coat':
-        draw.line([(x+2, y+2), (x+2, y+h-2)], fill=WHITE)
-        draw.line([(x+w-3, y+2), (x+w-3, y+h-2)], fill=WHITE)
-    elif style == 'dress':
-        draw.polygon([(x, y+h), (x+w//2, y+h-4), (x+w, y+h)], fill=clothes, outline=OUTLINE)
+    if style == "shirt_tie":
+        cx = x + w // 2
+        draw.line([(cx, y), (cx, y + 3)], fill=WHITE)
+        draw.rectangle([cx - 1, y + 3, cx + 1, y + 4], fill=WHITE)
+    elif style == "lab_coat":
+        draw.line([(x + 2, y + 2), (x + 2, y + h - 2)], fill=WHITE)
+        draw.line([(x + w - 3, y + 2), (x + w - 3, y + h - 2)], fill=WHITE)
+    elif style == "dress":
+        draw.polygon(
+            [(x, y + h), (x + w // 2, y + h - 4), (x + w, y + h)],
+            fill=clothes,
+            outline=OUTLINE,
+        )
 
 
 def draw_arms(draw, x, y, skin, clothes, frame=0):
@@ -64,12 +79,29 @@ def draw_arms(draw, x, y, skin, clothes, frame=0):
     left_off = frame % 2
     right_off = 1 - left_off
     # Left arm moved 2px closer (3px width) with hand
-    draw.rectangle([x-3, y+left_off,   x-1, y+6+left_off], fill=clothes, outline=OUTLINE)
-    draw.rectangle([x-3, y+7+left_off, x-1, y+9+left_off], fill=skin,    outline=OUTLINE)
+    draw.rectangle(
+        [x - 3, y + left_off, x - 1, y + 6 + left_off],
+        fill=clothes,
+        outline=OUTLINE,
+    )
+    draw.rectangle(
+        [x - 3, y + 7 + left_off, x - 1, y + 9 + left_off],
+        fill=skin,
+        outline=OUTLINE,
+    )
     # Right arm (3px width) with hand
     rx = x + 12
-    draw.rectangle([rx,   y+right_off,   rx+2, y+6+right_off], fill=clothes, outline=OUTLINE)
-    draw.rectangle([rx,   y+7+right_off, rx+2, y+9+right_off], fill=skin,    outline=OUTLINE)
+    draw.rectangle(
+        [rx, y + right_off, rx + 2, y + 6 + right_off],
+        fill=clothes,
+        outline=OUTLINE,
+    )
+    draw.rectangle(
+        [rx, y + 7 + right_off, rx + 2, y + 9 + right_off],
+        fill=skin,
+        outline=OUTLINE,
+    )
+
 
 def draw_legs(draw, x, y, skin, pants, frame=0):
     """Draw legs with optional animation frame."""
@@ -80,23 +112,42 @@ def draw_legs(draw, x, y, skin, pants, frame=0):
     left_off = frame % 2
     right_off = 1 - left_off
     # left leg
-    draw.rectangle([left_x, y+left_off, left_x + leg_w - 1, y + 8 + left_off], fill=pants, outline=OUTLINE)
-    draw.rectangle([left_x, y + 9 + left_off, left_x + leg_w - 1, y + 9 + left_off], fill=skin, outline=OUTLINE)
+    draw.rectangle(
+        [left_x, y + left_off, left_x + leg_w - 1, y + 8 + left_off],
+        fill=pants,
+        outline=OUTLINE,
+    )
+    draw.rectangle(
+        [left_x, y + 9 + left_off, left_x + leg_w - 1, y + 9 + left_off],
+        fill=skin,
+        outline=OUTLINE,
+    )
     # right leg
-    draw.rectangle([right_x, y+right_off, right_x + leg_w - 1, y + 8 + right_off], fill=pants, outline=OUTLINE)
-    draw.rectangle([right_x, y + 9 + right_off, right_x + leg_w - 1, y + 9 + right_off], fill=skin, outline=OUTLINE)
+    draw.rectangle(
+        [right_x, y + right_off, right_x + leg_w - 1, y + 8 + right_off],
+        fill=pants,
+        outline=OUTLINE,
+    )
+    draw.rectangle(
+        [right_x, y + 9 + right_off, right_x + leg_w - 1, y + 9 + right_off],
+        fill=skin,
+        outline=OUTLINE,
+    )
+
 
 # UI helpers
 
+
 def to_hex(col):
     return f"#{col[0]:02X}{col[1]:02X}{col[2]:02X}"
+
 
 # Tkinter setup
 root = tk.Tk()
 root.title("Sprite Face Designer")
 
 PREVIEW_SCALE = 6  # for full sprite preview
-EDIT_SCALE = 20    # for face editor grid
+EDIT_SCALE = 20  # for face editor grid
 CANVAS_SIZE = SPRITE_SIZE * PREVIEW_SCALE
 
 # Animation
@@ -141,7 +192,14 @@ class SpriteAnimator:
 
     def export_gif(self, path, loops=0):
         frames = [render_sprite(f) for f in range(self.frames)]
-        frames[0].save(path, save_all=True, append_images=frames[1:], duration=FRAME_DELAY, loop=loops)
+        frames[0].save(
+            path,
+            save_all=True,
+            append_images=frames[1:],
+            duration=FRAME_DELAY,
+            loop=loops,
+        )
+
 
 # Variables
 skin_var = tk.StringVar(value=to_hex(SKIN_TONES[0]))
@@ -151,7 +209,7 @@ shirt_var = tk.StringVar(value=SHIRT_STYLES[0])
 face_color_var = tk.StringVar(value="#000000")
 
 # Face template (9 rows tall)
-face_template = [[None]*FACE_WIDTH for _ in range(FACE_HEIGHT)]
+face_template = [[None] * FACE_WIDTH for _ in range(FACE_HEIGHT)]
 
 # Layout
 ctrl = tk.Frame(root)
@@ -166,64 +224,108 @@ skin_menu = tk.OptionMenu(ctrl, skin_var, *[to_hex(c) for c in SKIN_TONES])
 skin_menu.grid(row=0, column=1)
 # Hair style
 tk.Label(ctrl, text="Hair Style:").grid(row=1, column=0)
-hair_menu = tk.OptionMenu(ctrl, hair_var, *["flat","side_part","messy"])
+hair_menu = tk.OptionMenu(ctrl, hair_var, *["flat", "side_part", "messy"])
 hair_menu.grid(row=1, column=1)
 # Hair color
 tk.Label(ctrl, text="Hair Color:").grid(row=2, column=0)
-hc_menu = tk.OptionMenu(ctrl, hair_color_var, *[to_hex(c) for c in HAIR_COLORS])
+hc_menu = tk.OptionMenu(
+    ctrl, hair_color_var, *[to_hex(c) for c in HAIR_COLORS]
+)
 hc_menu.grid(row=2, column=1)
 # Face color picker
 tk.Label(ctrl, text="Face Pixel Color:").grid(row=3, column=0)
 clr_entry = tk.Entry(ctrl, textvariable=face_color_var, width=10)
 clr_entry.grid(row=3, column=1)
-pick_btn = tk.Button(ctrl, text="Pick...", command=lambda: face_color_var.set(colorchooser.askcolor()[1]))
+pick_btn = tk.Button(
+    ctrl,
+    text="Pick...",
+    command=lambda: face_color_var.set(colorchooser.askcolor()[1]),
+)
 pick_btn.grid(row=3, column=2)
 
 # Face editor grid
-tk.Label(ctrl, text=f"Paint Face ({FACE_WIDTH}×{FACE_HEIGHT}):").grid(row=4, column=0, columnspan=3)
-ed_cr = tk.Canvas(ctrl, width=FACE_WIDTH*EDIT_SCALE, height=FACE_HEIGHT*EDIT_SCALE, bg="#333")
+tk.Label(ctrl, text=f"Paint Face ({FACE_WIDTH}×{FACE_HEIGHT}):").grid(
+    row=4, column=0, columnspan=3
+)
+ed_cr = tk.Canvas(
+    ctrl,
+    width=FACE_WIDTH * EDIT_SCALE,
+    height=FACE_HEIGHT * EDIT_SCALE,
+    bg="#333",
+)
 ed_cr.grid(row=5, column=0, columnspan=3)
 for r in range(FACE_HEIGHT):
     for c in range(FACE_WIDTH):
-        ed_cr.create_rectangle(c*EDIT_SCALE, r*EDIT_SCALE,
-                                (c+1)*EDIT_SCALE, (r+1)*EDIT_SCALE,
-                                outline="#555", fill="#333")
+        ed_cr.create_rectangle(
+            c * EDIT_SCALE,
+            r * EDIT_SCALE,
+            (c + 1) * EDIT_SCALE,
+            (r + 1) * EDIT_SCALE,
+            outline="#555",
+            fill="#333",
+        )
+
 
 def on_edit(event):
     col = event.x // EDIT_SCALE
     row = event.y // EDIT_SCALE
     hx = face_color_var.get()
-    if hx.startswith('#') and len(hx)==7:
+    if hx.startswith("#") and len(hx) == 7:
         face_template[row][col] = hx
-        ed_cr.create_rectangle(col*EDIT_SCALE, row*EDIT_SCALE,
-                               (col+1)*EDIT_SCALE, (row+1)*EDIT_SCALE,
-                               outline=to_hex(OUTLINE), fill=hx)
+        ed_cr.create_rectangle(
+            col * EDIT_SCALE,
+            row * EDIT_SCALE,
+            (col + 1) * EDIT_SCALE,
+            (row + 1) * EDIT_SCALE,
+            outline=to_hex(OUTLINE),
+            fill=hx,
+        )
     update_preview()
+
+
 ed_cr.bind("<Button-1>", on_edit)
+
 
 # Right-click to clear single cell
 def on_clear(event):
-    col=event.x//EDIT_SCALE;row=event.y//EDIT_SCALE
-    face_template[row][col]=None
-    ed_cr.create_rectangle(col*EDIT_SCALE,row*EDIT_SCALE,(col+1)*EDIT_SCALE,(row+1)*EDIT_SCALE,outline="#555",fill="#333")
+    col = event.x // EDIT_SCALE
+    row = event.y // EDIT_SCALE
+    face_template[row][col] = None
+    ed_cr.create_rectangle(
+        col * EDIT_SCALE,
+        row * EDIT_SCALE,
+        (col + 1) * EDIT_SCALE,
+        (row + 1) * EDIT_SCALE,
+        outline="#555",
+        fill="#333",
+    )
     update_preview()
 
 
 ed_cr.bind("<Button-3>", on_clear)
 
+
 # Clear All button
 def clear_all():
     for r in range(FACE_HEIGHT):
-        for c in range(FACE_WIDTH): face_template[r][c]=None
+        for c in range(FACE_WIDTH):
+            face_template[r][c] = None
     ed_cr.delete("all")
     for r in range(FACE_HEIGHT):
         for c in range(FACE_WIDTH):
-            ed_cr.create_rectangle(c*EDIT_SCALE,r*EDIT_SCALE,(c+1)*EDIT_SCALE,(r+1)*EDIT_SCALE,outline="#555",fill="#333")
+            ed_cr.create_rectangle(
+                c * EDIT_SCALE,
+                r * EDIT_SCALE,
+                (c + 1) * EDIT_SCALE,
+                (r + 1) * EDIT_SCALE,
+                outline="#555",
+                fill="#333",
+            )
     update_preview()
 
-btn_clear=tk.Button(ctrl,text="Clear Face",command=clear_all)
-btn_clear.grid(row=6,column=0,columnspan=3,pady=5)
 
+btn_clear = tk.Button(ctrl, text="Clear Face", command=clear_all)
+btn_clear.grid(row=6, column=0, columnspan=3, pady=5)
 
 
 # Preview update
@@ -231,23 +333,27 @@ def render_sprite(frame=0):
     img = Image.new("RGBA", (SPRITE_SIZE, SPRITE_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     # Skin & hair
-    skin = tuple(int(skin_var.get()[i:i+2], 16) for i in (1, 3, 5))
-    hair = tuple(int(hair_color_var.get()[i:i+2], 16) for i in (1, 3, 5))
+    skin = tuple(int(skin_var.get()[i : i + 2], 16) for i in (1, 3, 5))
+    hair = tuple(int(hair_color_var.get()[i : i + 2], 16) for i in (1, 3, 5))
     # Draw head
     head_x = (SPRITE_SIZE - HEAD_WIDTH) // 2
-    draw.rectangle([
-        head_x,
-        HEAD_Y,
-        head_x + HEAD_WIDTH - 1,
-        HEAD_Y + HEAD_HEIGHT - 1,
-    ], fill=skin, outline=OUTLINE)
+    draw.rectangle(
+        [
+            head_x,
+            HEAD_Y,
+            head_x + HEAD_WIDTH - 1,
+            HEAD_Y + HEAD_HEIGHT - 1,
+        ],
+        fill=skin,
+        outline=OUTLINE,
+    )
     draw_hair(draw, head_x, HEAD_Y, hair)
     # Draw custom face pixels
     for r in range(FACE_HEIGHT):
         for c in range(FACE_WIDTH):
             px = face_template[r][c]
             if px:
-                col = tuple(int(px[i:i + 2], 16) for i in (1, 3, 5))
+                col = tuple(int(px[i : i + 2], 16) for i in (1, 3, 5))
                 draw.point((head_x + 1 + c, HEAD_Y + 1 + r), fill=col)
     # Draw body
     body_x = (SPRITE_SIZE - 12) // 2
@@ -267,7 +373,8 @@ def update_preview(*args):
     preview = img.resize((CANVAS_SIZE, CANVAS_SIZE), Image.NEAREST)
     tk_img = ImageTk.PhotoImage(preview)
     canvas.image = tk_img
-    canvas.create_image(0,0,anchor=tk.NW,image=tk_img)
+    canvas.create_image(0, 0, anchor=tk.NW, image=tk_img)
+
 
 # Generate & Save with incremental filenames
 def generate():
@@ -281,6 +388,7 @@ def generate():
     messagebox.showinfo("Saved", f"Sprite saved to {path}")
     SAVE_INDEX += 1
 
+
 # Bind events
 for var in (skin_var, hair_var, hair_color_var, face_color_var):
     var.trace_add("write", update_preview)
@@ -293,10 +401,12 @@ animator = SpriteAnimator()
 btn_anim = tk.Button(ctrl, text="Animate", command=animator.toggle)
 btn_anim.grid(row=8, column=0, columnspan=3, pady=5)
 
+
 def export_gif():
     path = os.path.join(OUTPUT_DIR, f"animation_{SAVE_INDEX:03d}.gif")
     animator.export_gif(path)
     messagebox.showinfo("Exported", f"Animation saved to {path}")
+
 
 btn_export = tk.Button(ctrl, text="Export GIF", command=export_gif)
 btn_export.grid(row=9, column=0, columnspan=3, pady=5)

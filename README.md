@@ -18,6 +18,7 @@ PixelPersona is a small Python/Tkinter application for creating 32x32 pixel-art 
 
 ## Installation
 
+
 ```bash
 git clone https://github.com/your-username/spritegen.git
 cd spritegen
@@ -46,12 +47,3 @@ Each click on *Generate Sprite* increments the output file number (`custom_sprit
 This repository currently generates static sprites only. Support for animated output
 (e.g. spritesheets or GIFs) is not yet implemented. If animation features are added
 in the future, this section will contain instructions on how to use them.
-
-## Running Tests
-
-No automated tests ship with the project yet. Once tests are added,
-they can be executed with:
-
-```bash
-pytest
-```

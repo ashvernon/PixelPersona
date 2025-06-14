@@ -255,5 +255,5 @@ for var in (skin_var, hair_var, hair_color_var, face_color_var):
     var.trace_add("write", update_preview)
 update_preview()
 btn = tk.Button(ctrl, text="Generate Sprite", command=generate)
-btn.grid(row=6, column=0, columnspan=3, pady=10)
+btn.grid(row=7, column=0, columnspan=3, pady=10)
 root.mainloop()

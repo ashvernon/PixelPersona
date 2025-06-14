@@ -209,8 +209,6 @@ class SpriteAnimator:
 
 
 # Variables
-skin_var = tk.StringVar(value=to_hex(SKIN_TONES[0]))
-=======
 # Tkinter setup -----------------------------------------------------------
 root = tk.Tk()
 root.title("Sprite Face Designer")
@@ -248,16 +246,7 @@ hair_menu = tk.OptionMenu(ctrl, hair_var, *["flat", "side_part", "messy"])
 hair_menu.grid(row=1, column=1)
 # Hair color
 tk.Label(ctrl, text="Hair Color:").grid(row=2, column=0)
-hc_menu = tk.OptionMenu(
-    ctrl, hair_color_var, *[to_hex(c) for c in HAIR_COLORS]
-)
-
-hair_menu = tk.OptionMenu(ctrl, hair_var, "flat", "side_part", "messy")
-hair_menu.grid(row=1, column=1)
-# Hair color
-tk.Label(ctrl, text="Hair Color:").grid(row=2, column=0)
-hc_menu = tk.OptionMenu(ctrl, hair_color_var, *[f"#{c[0]:02X}{c[1]:02X}{c[2]:02X}" for c in HAIR_COLORS])
-
+hc_menu = tk.OptionMenu(ctrl, hair_color_var, *[to_hex(c) for c in HAIR_COLORS])
 hc_menu.grid(row=2, column=1)
 # Face color picker
 tk.Label(ctrl, text="Face Pixel Color:").grid(row=3, column=0)
@@ -292,16 +281,6 @@ for r in range(FACE_HEIGHT):
             outline="#555",
             fill="#333",
         )
-
-# Face editor grid -------------------------------------------------------
-tk.Label(ctrl, text=f"Paint Face ({FACE_WIDTH}×{FACE_HEIGHT}):").grid(row=4, column=0, columnspan=3)
-ed_cr = tk.Canvas(ctrl, width=FACE_WIDTH * EDIT_SCALE, height=FACE_HEIGHT * EDIT_SCALE, bg="#333")
-ed_cr.grid(row=5, column=0, columnspan=3)
-for r in range(FACE_HEIGHT):
-    for c in range(FACE_WIDTH):
-        ed_cr.create_rectangle(c * EDIT_SCALE, r * EDIT_SCALE,
-                               (c + 1) * EDIT_SCALE, (r + 1) * EDIT_SCALE,
-                               outline="#555", fill="#333")
 
 
 

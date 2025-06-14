@@ -31,18 +31,9 @@ CLOTHES_COLORS = hex_palette(["E6194B", "3CB44B", "0082C8", "F58230", "911EB4", 
 PANTS_COLORS = hex_palette(["323232", "1E90FF", "228B22", "800080"])
 OUTLINE = (0, 0, 0)
 WHITE = (255, 255, 255)
-EYE_COLORS = [(0, 0, 0), (0, 0, 100), (100, 0, 0), (0, 100, 0)]
 SHIRT_STYLES = ["tshirt", "shirt_tie", "lab_coat", "dress"]
 
 # Drawing helpers
-
-def draw_eyes(draw, x, y):
-    for ox in (-2, 1):
-        ex, ey = x + ox, y
-        draw.rectangle([ex, ey, ex+1, ey+1], fill=WHITE, outline=OUTLINE)
-        draw.point((ex, ey), fill=random.choice(EYE_COLORS))
-
-
 def draw_hair(draw, x, y, color):
     style = hair_var.get()
     if style == "flat":
@@ -167,9 +158,8 @@ def on_clear(event):
     ed_cr.create_rectangle(col*EDIT_SCALE,row*EDIT_SCALE,(col+1)*EDIT_SCALE,(row+1)*EDIT_SCALE,outline="#555",fill="#333")
     update_preview()
 
-d_ed=ed_cr.bind
-ed_cr.bind("<Button-1>",on_edit)
-ed_cr.bind("<Button-3>",on_clear)
+
+ed_cr.bind("<Button-3>", on_clear)
 
 # Clear All button
 def clear_all():

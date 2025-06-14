@@ -9,7 +9,7 @@ Choose body shapes, clothing styles (shirt & tie, lab coat, dress), preview an a
 
 ![Design Screenshot](screenshot.png)
 ![Animation Preview](anim_001.gif)
-<img src="anim_001.gif" alt="Animation Preview" width="500" />
+<img src="anim_001.gif" alt="Animation Preview" width="100" />
 
 
 ---

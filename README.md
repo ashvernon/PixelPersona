@@ -1,45 +1,49 @@
-A simple Python/Tkinter application for generating 32×32 pixel-art sprites with editable 8×9 face templates.
+# PixelPersona
+
+PixelPersona is a small Python/Tkinter application for creating 32x32 pixel-art characters. It features an interactive 8×9 pixel face editor and randomly generated outfits.
 
 ## Screenshot
 
 ![PixelPersona Preview](docs/screenshot.png)
 
-Features
+## Features
+- Interactive face editor with color picker and clear functionality
+- Randomized body, arms, legs, hair and clothing styles
+- Incremental saves under `output_sprites/custom_sprite_XXX.png`
 
-Interactive face editor (8×9 grid) with color picker and clear functionality
+## Dependencies
+- Python 3.9+
+- Pillow
+- tkinter (usually included with Python on most systems)
 
-Randomized body, arms, legs, hair, and clothing styles
+## Installation
 
-Incremental save of custom_sprite_XXX.png files to avoid overwriting
 
-Export sprites as PNGs in output_sprites/
-
-Optional animation preview and GIF export
-
-Installation
-
-# Clone the repo
+```bash
 git clone https://github.com/your-username/spritegen.git
 cd spritegen
-
-# (Optional) Create & activate a virtual environment
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
-venv\Scripts\activate   # Windows
-
-# Install dependencies
+python -m venv venv        # optional
+source venv/bin/activate   # macOS/Linux
+venv\Scripts\activate    # Windows
 pip install pillow tk
+```
 
-Usage
+## Usage
 
-# Launch the GUI
+```bash
 python main.py
+```
 
-Use the Skin Tone, Hair Style, and Hair Color menus to set base colors.
+1. Select a skin tone, hair style and hair color from the menus.
+2. Pick a face pixel color using the color picker.
+3. Left-click in the face grid to paint; right-click to erase individual pixels.
+4. Click **Clear Face** to reset the grid.
+5. Press **Generate Sprite** to save your design in the `output_sprites/` folder.
 
-Click Pick... to open a color picker for face pixels.
+Each click on *Generate Sprite* increments the output file number (`custom_sprite_001.png`, `custom_sprite_002.png`, …).
 
-Left-click on the 8×9 grid to paint a pixel; right-click to erase a single pixel; click Clear Face to reset the grid.
+## Animation
 
-Press Generate Sprite to save a new PNG under output_sprites/custom_sprite_001.png, custom_sprite_002.png, etc.
-Use the **Animate** button to preview walking frames. You can also export the animation as a GIF via **Export GIF**.
+This repository currently generates static sprites only. Support for animated output
+(e.g. spritesheets or GIFs) is not yet implemented. If animation features are added
+in the future, this section will contain instructions on how to use them.

@@ -1,2 +1,1 @@
-Pillow
-tk
+Pillow>=8.0.0

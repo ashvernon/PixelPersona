@@ -14,6 +14,8 @@ Incremental save of custom_sprite_XXX.png files to avoid overwriting
 
 Export sprites as PNGs in output_sprites/
 
+Optional animation preview and GIF export
+
 Installation
 
 # Clone the repo
@@ -40,3 +42,4 @@ Click Pick... to open a color picker for face pixels.
 Left-click on the 8×9 grid to paint a pixel; right-click to erase a single pixel; click Clear Face to reset the grid.
 
 Press Generate Sprite to save a new PNG under output_sprites/custom_sprite_001.png, custom_sprite_002.png, etc.
+Use the **Animate** button to preview walking frames. You can also export the animation as a GIF via **Export GIF**.

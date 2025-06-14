@@ -59,26 +59,32 @@ def draw_body(draw, x, y, clothes):
         draw.polygon([(x, y+h), (x+w//2, y+h-4), (x+w, y+h)], fill=clothes, outline=OUTLINE)
 
 
-def draw_arms(draw, x, y, skin, clothes):
+def draw_arms(draw, x, y, skin, clothes, frame=0):
+    """Draw arms with optional animation frame."""
+    left_off = frame % 2
+    right_off = 1 - left_off
     # Left arm moved 2px closer (3px width) with hand
-    draw.rectangle([x-3, y,   x-1, y+6], fill=clothes, outline=OUTLINE)
-    draw.rectangle([x-3, y+7, x-1, y+9], fill=skin,    outline=OUTLINE)
+    draw.rectangle([x-3, y+left_off,   x-1, y+6+left_off], fill=clothes, outline=OUTLINE)
+    draw.rectangle([x-3, y+7+left_off, x-1, y+9+left_off], fill=skin,    outline=OUTLINE)
     # Right arm (3px width) with hand
     rx = x + 12
-    draw.rectangle([rx,   y,   rx+2, y+6], fill=clothes, outline=OUTLINE)
-    draw.rectangle([rx,   y+7, rx+2, y+9], fill=skin,    outline=OUTLINE)
+    draw.rectangle([rx,   y+right_off,   rx+2, y+6+right_off], fill=clothes, outline=OUTLINE)
+    draw.rectangle([rx,   y+7+right_off, rx+2, y+9+right_off], fill=skin,    outline=OUTLINE)
 
-def draw_legs(draw, x, y, skin, pants):
+def draw_legs(draw, x, y, skin, pants, frame=0):
+    """Draw legs with optional animation frame."""
     # Widened legs to 3px and better centered
     leg_w = 3  # width of each leg
-    # left leg
     left_x = x + 1  # move in from body edge
-    draw.rectangle([left_x, y, left_x + leg_w - 1, y + 8], fill=pants, outline=OUTLINE)
-    draw.rectangle([left_x, y + 9, left_x + leg_w - 1, y + 9], fill=skin, outline=OUTLINE)
-    # right leg
     right_x = x + 12 - leg_w - 1  # align from body right edge
-    draw.rectangle([right_x, y, right_x + leg_w - 1, y + 8], fill=pants, outline=OUTLINE)
-    draw.rectangle([right_x, y + 9, right_x + leg_w - 1, y + 9], fill=skin, outline=OUTLINE)
+    left_off = frame % 2
+    right_off = 1 - left_off
+    # left leg
+    draw.rectangle([left_x, y+left_off, left_x + leg_w - 1, y + 8 + left_off], fill=pants, outline=OUTLINE)
+    draw.rectangle([left_x, y + 9 + left_off, left_x + leg_w - 1, y + 9 + left_off], fill=skin, outline=OUTLINE)
+    # right leg
+    draw.rectangle([right_x, y+right_off, right_x + leg_w - 1, y + 8 + right_off], fill=pants, outline=OUTLINE)
+    draw.rectangle([right_x, y + 9 + right_off, right_x + leg_w - 1, y + 9 + right_off], fill=skin, outline=OUTLINE)
 
 # UI helpers
 
@@ -92,6 +98,50 @@ root.title("Sprite Face Designer")
 PREVIEW_SCALE = 6  # for full sprite preview
 EDIT_SCALE = 20    # for face editor grid
 CANVAS_SIZE = SPRITE_SIZE * PREVIEW_SCALE
+
+# Animation
+FRAME_DELAY = 250  # milliseconds between frames
+anim_frame = 0
+
+
+class SpriteAnimator:
+    """Simple Tk-based sprite animator."""
+
+    def __init__(self, frames=2):
+        self.frames = frames
+        self.running = False
+        self._after_id = None
+        self.frame = 0
+
+    def _tick(self):
+        global anim_frame
+        anim_frame = self.frame
+        update_preview()
+        self.frame = (self.frame + 1) % self.frames
+        self._after_id = root.after(FRAME_DELAY, self._tick)
+
+    def start(self):
+        if not self.running:
+            self.running = True
+            self.frame = 0
+            self._tick()
+
+    def stop(self):
+        if self.running:
+            self.running = False
+            if self._after_id:
+                root.after_cancel(self._after_id)
+                self._after_id = None
+
+    def toggle(self):
+        if self.running:
+            self.stop()
+        else:
+            self.start()
+
+    def export_gif(self, path, loops=0):
+        frames = [render_sprite(f) for f in range(self.frames)]
+        frames[0].save(path, save_all=True, append_images=frames[1:], duration=FRAME_DELAY, loop=loops)
 
 # Variables
 skin_var = tk.StringVar(value=to_hex(SKIN_TONES[0]))
@@ -177,32 +227,42 @@ btn_clear.grid(row=6,column=0,columnspan=3,pady=5)
 
 
 # Preview update
-def update_preview(*args):
-    canvas.delete("all")
-    img = Image.new("RGBA", (SPRITE_SIZE, SPRITE_SIZE), (0,0,0,0))
+def render_sprite(frame=0):
+    img = Image.new("RGBA", (SPRITE_SIZE, SPRITE_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     # Skin & hair
-    skin = tuple(int(skin_var.get()[i:i+2],16) for i in (1,3,5))
-    hair = tuple(int(hair_color_var.get()[i:i+2],16) for i in (1,3,5))
+    skin = tuple(int(skin_var.get()[i:i+2], 16) for i in (1, 3, 5))
+    hair = tuple(int(hair_color_var.get()[i:i+2], 16) for i in (1, 3, 5))
     # Draw head
-    head_x = (SPRITE_SIZE - HEAD_WIDTH)//2
-    draw.rectangle([head_x, HEAD_Y, head_x+HEAD_WIDTH-1, HEAD_Y+HEAD_HEIGHT-1], fill=skin, outline=OUTLINE)
+    head_x = (SPRITE_SIZE - HEAD_WIDTH) // 2
+    draw.rectangle([
+        head_x,
+        HEAD_Y,
+        head_x + HEAD_WIDTH - 1,
+        HEAD_Y + HEAD_HEIGHT - 1,
+    ], fill=skin, outline=OUTLINE)
     draw_hair(draw, head_x, HEAD_Y, hair)
     # Draw custom face pixels
     for r in range(FACE_HEIGHT):
         for c in range(FACE_WIDTH):
             px = face_template[r][c]
             if px:
-                col = tuple(int(px[i:i+2],16) for i in (1,3,5))
-                draw.point((head_x+1+c, HEAD_Y+1+r), fill=col)
+                col = tuple(int(px[i:i + 2], 16) for i in (1, 3, 5))
+                draw.point((head_x + 1 + c, HEAD_Y + 1 + r), fill=col)
     # Draw body
-    body_x = (SPRITE_SIZE - 12)//2
+    body_x = (SPRITE_SIZE - 12) // 2
     body_y = HEAD_Y + HEAD_HEIGHT
     clothes = random.choice(CLOTHES_COLORS)
     pants = random.choice(PANTS_COLORS)
     draw_body(draw, body_x, body_y, clothes)
-    draw_arms(draw, body_x, body_y+2, skin, clothes)
-    draw_legs(draw, body_x, body_y+10, skin, pants)
+    draw_arms(draw, body_x, body_y + 2, skin, clothes, frame)
+    draw_legs(draw, body_x, body_y + 10, skin, pants, frame)
+    return img
+
+
+def update_preview(*args):
+    canvas.delete("all")
+    img = render_sprite(anim_frame)
     # Scale and render
     preview = img.resize((CANVAS_SIZE, CANVAS_SIZE), Image.NEAREST)
     tk_img = ImageTk.PhotoImage(preview)
@@ -213,26 +273,7 @@ def update_preview(*args):
 def generate():
     global SAVE_INDEX
     update_preview()
-    img = Image.new("RGBA", (SPRITE_SIZE, SPRITE_SIZE), (0,0,0,0))
-    d = ImageDraw.Draw(img)
-    # Draw head, face, body, arms, legs (reuse existing draw calls)
-    skin = tuple(int(skin_var.get()[i:i+2],16) for i in (1,3,5))
-    hair = tuple(int(hair_color_var.get()[i:i+2],16) for i in (1,3,5))
-    head_x = (SPRITE_SIZE - HEAD_WIDTH)//2
-    d.rectangle([head_x, HEAD_Y, head_x+HEAD_WIDTH-1, HEAD_Y+HEAD_HEIGHT-1], fill=skin, outline=OUTLINE)
-    draw_hair(d, head_x, HEAD_Y, hair)
-    for r in range(FACE_HEIGHT):
-        for c in range(FACE_WIDTH):
-            px = face_template[r][c]
-            if px:
-                col = tuple(int(px[i:i+2],16) for i in (1,3,5))
-                d.point((head_x+1+c, HEAD_Y+1+r), fill=col)
-    bx, by = head_x-1, HEAD_Y+HEAD_HEIGHT
-    clothes = random.choice(CLOTHES_COLORS)
-    legs = random.choice(PANTS_COLORS)
-    draw_body(d, bx, by, clothes)
-    draw_arms(d, bx, by+2, skin, clothes)
-    draw_legs(d, bx, by+10, skin, legs)
+    img = render_sprite(anim_frame)
     # Save with incremental index
     filename = f"custom_sprite_{SAVE_INDEX:03d}.png"
     path = os.path.join(OUTPUT_DIR, filename)
@@ -246,4 +287,18 @@ for var in (skin_var, hair_var, hair_color_var, face_color_var):
 update_preview()
 btn = tk.Button(ctrl, text="Generate Sprite", command=generate)
 btn.grid(row=7, column=0, columnspan=3, pady=10)
+
+animator = SpriteAnimator()
+
+btn_anim = tk.Button(ctrl, text="Animate", command=animator.toggle)
+btn_anim.grid(row=8, column=0, columnspan=3, pady=5)
+
+def export_gif():
+    path = os.path.join(OUTPUT_DIR, f"animation_{SAVE_INDEX:03d}.gif")
+    animator.export_gif(path)
+    messagebox.showinfo("Exported", f"Animation saved to {path}")
+
+btn_export = tk.Button(ctrl, text="Export GIF", command=export_gif)
+btn_export.grid(row=9, column=0, columnspan=3, pady=5)
+
 root.mainloop()

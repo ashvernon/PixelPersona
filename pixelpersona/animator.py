@@ -1,5 +1,5 @@
 import tkinter as tk
-from PIL import ImageTk
+from PIL import Image, ImageTk
 
 class SpriteAnimator:
     """Simple animator that cycles through a list of PIL images."""
@@ -7,9 +7,12 @@ class SpriteAnimator:
     def __init__(self, canvas: tk.Canvas, frames, delay=200, scale=6):
         self.canvas = canvas
         self.delay = delay
-        self.frames = [ImageTk.PhotoImage(img.resize((img.width*scale, img.height*scale),
-                                                    Image.NEAREST))
-                       for img in frames]
+        self.frames = [
+            ImageTk.PhotoImage(
+                img.resize((img.width * scale, img.height * scale), Image.NEAREST)
+            )
+            for img in frames
+        ]
         self.index = 0
         self.running = False
 

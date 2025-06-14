@@ -1,5 +1,9 @@
 A simple Python/Tkinter application for generating 32×32 pixel-art sprites with editable 8×9 face templates.
 
+## Screenshot
+
+![PixelPersona Preview](docs/screenshot.png)
+
 Features
 
 Interactive face editor (8×9 grid) with color picker and clear functionality
